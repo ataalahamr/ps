@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PS4 Exploit Host by Eng.Amr Ataallah</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: #000 url('img.jpg') no-repeat center center fixed;
+    background-size: 65% auto;
+    color: #fff;
+    font-family: system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* 1. كود الجهاز أعلى اليمين */
+  #device-key-badge {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    padding: 8px 18px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00d4ff;
+    border: 1px solid #00d4ff;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 1rem;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    letter-spacing: 1px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* 2. زر الـ Console أعلى اليسار */
+  #toggle-console-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+    padding: 8px 18px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #00d4ff;
+    border: 1px solid #00d4ff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  #toggle-console-btn:hover {
+    background: #00d4ff;
+    color: #000;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+  }
+
+  /* 3. شريط العنوان واسم القائمة */
+  .title-card {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 0 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 212, 255, 0.5);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    z-index: 9990;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    max-width: 50%;
+    white-space: nowrap;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #msgs {
+    font-size: 0.95rem;
+    color: #00d4ff;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  }
+
+  /* نافذة الـ Console */
+  #console {
+    position: fixed;
+    bottom: 90px;
+    left: 5%;
+    width: 90%;
+    max-height: 180px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid #00d4ff;
+    color: #00ff66;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: left;
+    direction: ltr;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.85rem;
+    z-index: 9998;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+  }
+
+  /* 4. حاوية أزرار التوجيه مثبتة أسفل الشاشة على اليمين والشرق */
+  #menu {
+    position: fixed;
+    bottom: 25px; /* ثابتة في الأسفل */
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .buttons-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 95%;
+    max-width: 95%; /* توسيع المسافة لأطراف الشاشة */
+    gap: 20px;
+  }
+
+  .btn-custom {
+    padding: 12px 22px;
+    background: rgba(20, 20, 20, 0.85);
+    color: #fff;
+    border: 1px solid rgba(0, 212, 255, 0.5);
+    border-radius: 100px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(5px);
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    min-width: 200px;
+  }
+
+  .btn-custom:hover {
+    background: #00d4ff;
+    color: #000;
+    border-color: #00d4ff;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+    /* تم إلغاء حركة transform لإبقاء الزر ثابتاً تماماً */
+  }
+
+  /* 5. زر التبرع في المنتصف بمحاذاة الأزرار ومرفوع قليلاً */
+  .btn-donate {
+    position: fixed;
+    bottom: 25px; /* نفس ارتفاع الأزرار في الأسفل */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    min-width: 220px;
+    max-width: 280px;
+    padding: 12px 20px;
+    border-color: #ffcc00;
+    color: #ffcc00;
+    font-size: 0.85rem;
+    z-index: 9990;
+  }
+
+  .btn-donate:hover {
+    background: #ffcc00;
+    color: #000;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+  }
+
+  /* قسم التبرع */
+  #crypto {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid #ffcc00;
+    text-align: center;
+    margin: auto;
+    max-width: 400px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 25px rgba(255, 204, 0, 0.2);
+    z-index: 9999;
+  }
+
+  #crypto img {
+    border-radius: 10px;
+    margin: 15px 0;
+    border: 2px solid #ffcc00;
+  }
+</style>
+
+<script>
+  const FIREBASE_URL = "https://ps4-control-7ad50-default-rtdb.firebaseio.com";
+
+  function getDeviceKeyNumber() {
+    let savedKey = localStorage.getItem("device_key_num");
+    if (!savedKey) {
+      let str = navigator.userAgent + screen.width + screen.height;
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+      }
+      savedKey = (Math.abs(hash) % 8999) + 1000;
+      localStorage.setItem("device_key_num", savedKey);
+    }
+    return parseInt(savedKey, 10);
+  }
+
+  async function checkOnlineBlockStatus(deviceKeyStr) {
+    if (navigator.onLine) {
+      try {
+        let res = await fetch(`${FIREBASE_URL}/devices/${deviceKeyStr}.json?t=${Date.now()}`);
+        if (res.ok) {
+          let data = await res.json();
+          if (data && data.status === "blocked") {
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:40vh; font-family:sans-serif;'>تم حظر هذا الجهاز من قبل المسؤول!</h1>";
+            window.stop();
+          }
+        }
+      } catch (e) {
+        console.log("Offline mode or Fetch error");
+      }
+    }
+  }
+
+  (function initDeviceCheck() {
+    const keyNum = getDeviceKeyNumber();
+    const deviceKeyStr = "AT-" + keyNum;
+
+    checkOnlineBlockStatus(deviceKeyStr);
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const badgeElem = document.getElementById("device-key-badge");
+      if (badgeElem) badgeElem.textContent = deviceKeyStr;
+    });
+  })();
+</script>
+</head>
+<body>
+
+<script>
+  var histlength = history.length;
+  history.go(-histlength + 2);
+</script>
+
+<div id="device-key-badge">AT-0000</div>
+
+<div class="title-card">
+  <div id="msgs">PS4 Exploit Host by Eng.Amr Ataallah</div>
+</div>
+
+<button id="toggle-console-btn" onclick="openConsole()">Console</button>
+<pre id="console" style="display: none;">Ready. Awaiting execution...</pre>
+
+<!-- القائمة السفلية (زرين على اليمين واليسار) -->
+<div id="menu">
+  <div class="buttons-row">
+    <a href="g2all/index.html" class="btn-custom" 
+       onmouseover="document.getElementById('msgs').innerHTML='PS4 7.00 - 9.60 FW GoldHEN Host - Psfree Webkit'" 
+       onmouseout="document.getElementById('msgs').innerHTML='PS4 Exploit Host by Eng.Amr Ataallah'">
+      تعديل 7.00 - 9.60
+    </a>
+
+    <a href="ntfonto/index.html" class="btn-custom" 
+       onmouseover="document.getElementById('msgs').innerHTML='Eng.Amr Ataallah Bios Exploit Host'" 
+       onmouseout="document.getElementById('msgs').innerHTML='PS4 Exploit Host by Eng.Amr Ataallah'">
+      Eng.Amr Ataallah Bios Exploit
+    </a>
+  </div>
+</div>
+
+<!-- زر التبرع في المنتصف بمحاذاة الأزرار سفلية -->
+<button id="donate-btn-main" class="btn-custom btn-donate" 
+        onmouseover="document.getElementById('msgs').innerHTML='If you like my work you can support me with a donation.'" 
+        onmouseout="document.getElementById('msgs').innerHTML='PS4 Exploit Host by Eng.Amr Ataallah'" 
+        onclick="donations()">
+  For Donations (InstaPay)
+</button>
+
+<div id="crypto">
+  <h1 style="font-size: 1.1rem; color: #ffcc00; margin-bottom: 5px;">Donate with InstaPay (EGP)</h1>
+  <img src="btc.jpg" width="140" height="140" alt="InstaPay QR">
+  <h2 style="font-size: 1rem; color: #fff; margin-bottom: 15px;">amrgenuis@instapay</h2>
+  <button class="btn-custom" onclick="load_menu()" style="padding: 8px 25px; width: auto;">Return</button>
+</div>
+
+<script>
+function donations(){
+  document.getElementById("crypto").style.display = "flex";
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("donate-btn-main").style.display = "none";
+}
+
+function load_menu(){
+  document.getElementById("menu").style.display = "flex";
+  document.getElementById("donate-btn-main").style.display = "block";
+  document.getElementById("crypto").style.display = "none";
+}
+
+function openConsole() {
+  const CONSOLE_PASSWORD = "Ataallah";
+  const consoleElem = document.getElementById("console");
+  
+  if (consoleElem.style.display === "none" || consoleElem.style.display === "") {
+    let pass = prompt("أدخل كلمة السر لعرض الـ Console:");
+    if (pass === CONSOLE_PASSWORD) {
+      consoleElem.style.display = "block";
+    } else {
+      alert("كلمة السر غير صحيحة!");
+    }
+  } else {
+    consoleElem.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>

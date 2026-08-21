@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ُEng.Amr Ataallah Bios Exploit</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000 url('img.jpg') no-repeat center center fixed;
+      background-size: 85% auto;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #toggle-console-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 9999;
+      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00d4ff;
+      border: 1px solid #00d4ff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #toggle-console-btn:hover {
+      background: #00d4ff;
+      color: #000;
+    }
+
+    .status-overlay {
+      margin-top: auto;
+      margin-bottom: 25px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 12px 25px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 212, 255, 0.4);
+      text-align: center;
+      max-width: 90%;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    }
+
+    #msgs {
+      font-size: 1.1rem;
+      color: #00d4ff;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    #autoJbLabel {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    #console {
+      position: fixed;
+      bottom: 90px;
+      left: 5%;
+      width: 90%;
+      max-height: 200px;
+      background: rgba(10, 10, 10, 0.95);
+      border: 1px solid #00d4ff;
+      color: #00ff66;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: left;
+      direction: ltr;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.85rem;
+      z-index: 9998;
+    }
+  </style>
+
+  <script>
+    const SECRET_KEY = 2026; // 
+
+    function getActivationCodeFromKey(keyNumber) {
+      return ((keyNumber * SECRET_KEY) % 899999) + 100000;
+    }
+
+    function getDeviceKeyNumber() {
+      let savedKey = localStorage.getItem("device_key_num");
+      if (!savedKey) {
+        let str = navigator.userAgent + screen.width + screen.height;
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = (hash << 5) - hash + str.charCodeAt(i);
+          hash |= 0;
+        }
+        savedKey = (Math.abs(hash) % 8999) + 1000; // رقم بين 1000 و 9999
+        localStorage.setItem("device_key_num", savedKey);
+      }
+      return parseInt(savedKey, 10);
+    }
+
+    (function checkDeviceActivation() {
+      const isActivated = localStorage.getItem("device_activated");
+
+      if (isActivated !== "true") {
+        const keyNum = getDeviceKeyNumber();
+        const deviceKeyStr = "AT-" + keyNum;
+        const expectedCode = getActivationCodeFromKey(keyNum);
+
+        console.log("Expected Activation Code for " + deviceKeyStr + " is: " + expectedCode);
+
+        let userCode = prompt(
+          "الجهاز غير مفعل!\n\n" +
+          "Device Key: " + deviceKeyStr + "\n\n" +
+          "أرسل هذا الكود عبر الواتساب على هاذ الرقم 01223739286 للحصول على كود تفعيل البايوس:"
+        );
+
+        if (userCode && parseInt(userCode.trim(), 10) === expectedCode) {
+          localStorage.setItem("device_activated", "true");
+          alert("تم تفعيل الجهاز بنجاح!");
+        } else {
+          alert("كود التفعيل غير صحيح!");
+          document.write("<h2 style='color:red; text-align:center; margin-top:20vh; font-family:sans-serif;'>Device Not Activated</h2>");
+          window.stop();
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <button id="toggle-console-btn" onclick="openConsole()">Console</button>
+
+  <pre id="console" style="display: none;">Ready. Awaiting execution...</pre>
+
+  <div class="status-overlay">
+    <div id="msgs">Eng.Amr Ataallah Bios Exploit</div>
+    <div id="autoJbLabel">Auto Jailbreak</div>
+  </div>
+
+  <script>
+    let timerId = null; 
+    const label = document.getElementById('autoJbLabel');
+    var exploitChain = localStorage.getItem("exploitChain") || "lapse";
+
+    function stopInterval(){
+        if (timerId !== null) {
+            clearInterval(timerId);
+            timerId = null;
+        }
+        label.textContent = "Auto Flash";
+    }
+
+    function jailbreakCountdown() {   
+        stopInterval();
+        let countdown = 5;
+        label.textContent = `Auto Flash in: ${countdown}`;
+        
+        timerId = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                label.textContent = `Auto Flash in: ${countdown}`;
+            } else {
+                clearInterval(timerId);
+                timerId = null;
+                label.textContent = 'Executing Exploit...';
+                
+                if (typeof doJb === "function") {
+                    doJb();
+                } else if (typeof main === "function") {
+                    main();
+                } else {
+                    console.log("Triggering exploit chain...");
+                }
+            }
+        }, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        jailbreakCountdown();
+    });
+
+    function openConsole() {
+      const CONSOLE_PASSWORD = "Ataallah";
+      const consoleElem = document.getElementById("console");
+      
+      if (consoleElem.style.display === "none" || consoleElem.style.display === "") {
+        let pass = prompt("أدخل كلمة السر لعرض الـ Console:");
+        if (pass === CONSOLE_PASSWORD) {
+          consoleElem.style.display = "block";
+        } else {
+          alert("كلمة السر غير صحيحة!");
+        }
+      } else {
+        consoleElem.style.display = "none";
+      }
+    }
+  </script>
+
+  <script src="src/main.js"></script>
+  <script src="includes/script.js"></script>
+</body>
+</html>
