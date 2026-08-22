@@ -199,21 +199,31 @@
             } else {
                 clearInterval(timerId);
                 timerId = null;
-                label.textContent = 'Executing Exploit...';
+                label.textContent = 'Stabilizing RAM & Executing...';
                 
-                if (typeof doJb === "function") {
-                    doJb();
-                } else if (typeof main === "function") {
-                    main();
-                } else {
-                    console.log("Triggering exploit chain...");
-                }
+                // تهيئة الذاكرة قبل الـ UAF للحد من التعليق
+                setTimeout(() => {
+                    if (window.gc) window.gc();
+                    
+                    if (typeof doJb === "function") {
+                        doJb();
+                    } else if (typeof main === "function") {
+                        main();
+                    } else if (typeof triggerExploit === "function") {
+                        triggerExploit();
+                    } else {
+                        console.log("Triggering exploit chain...");
+                    }
+                }, 1000); // إعطاء ثانية كاملة لترتيب الـ Heap
             }
         }, 1000);
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        jailbreakCountdown();
+        // تأخير انطلاق العد التنازلي لإعطاء مهلة لتحميل سكريبتات main.js و script.js
+        setTimeout(() => {
+            jailbreakCountdown();
+        }, 1500);
     });
 
     function openConsole() {
